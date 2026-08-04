@@ -289,24 +289,12 @@ claude mcp add --transport http kanban http://localhost:8000/mcp
 
 ### 4. 実際の使い方
 
-#### Task を作成して計画を立てる
+#### Task を登録する
 
-Claude Code に対して次のように指示します。
+実装計画を Claude と検討したら、`/kanban-registration` スキルを呼び出します。  
+スキルが `createTask` → `addTodo` × n の順で MCP tool を呼び、計画を kanban に登録します。
 
-```
-kanban に「ユーザー認証機能の実装」というタスクを作成して、
-planning スキルに従って todo に分割してください。
-```
-
-Claude Code は `createTask` → `addTodo` × n の順で MCP tool を呼びます。
-
-#### 実装を進める
-
-```
-implement スキルに従って、タスク 1 の実装を進めてください。
-```
-
-Claude Code は `getNextTodo` で次の todo を取得し、実装後に `updateTodo(done)` を呼ぶループを繰り返します。
+サーバーの画面（`http://localhost:8000/`）から手動で Task を作成することもできます。
 
 #### 人への質問と回答
 
@@ -335,15 +323,3 @@ deno run -A command/main.ts --interval 60
 2. 各タスクの次の todo を取得する（`waiting` 中は人の回答待ちとしてスキップ）
 3. `claude -p "..."` を起動し、implement スキルに沿って todo を実行させる
 4. 指定した間隔で繰り返す
-
-`--once` を付けると 1 回実行して終了します。CI や cron での利用に向いています。
-
----
-
-
-
-```
-タスク 1 に「まずセキュリティレビューをしてほしい」という割り込みを入れてください。
-```
-
-Claude Code は `interruptTodo` を呼び、次の `getNextTodo` 呼び出しで割り込み todo が最優先で返ります。
