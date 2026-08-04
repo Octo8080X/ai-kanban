@@ -1,0 +1,14 @@
+{
+  "workspace": ["./server", "./client", "./command"],
+  "tasks": {
+    "dev": "deno run --watch -A main.ts",
+    "dev:server": "deno run --watch -A server/main.ts",
+    "dev:mcp": "deno run --watch -A server/src/mcp/main.ts",
+    "dev:client": "deno run --watch -A client/main.ts",
+    "run:command": "deno run -A command/main.ts",
+    "test": "deno test"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.13"
+  }
+}
