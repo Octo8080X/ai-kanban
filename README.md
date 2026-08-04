@@ -178,33 +178,6 @@ deno task dev:client
 deno run -A client/main.ts http://your-host/mcp
 ```
 
-### 自分のコードへの組み込み
-
-`client/main.ts` を参考に、`@modelcontextprotocol/sdk@1.29.0` の `Client` と `StreamableHTTPClientTransport` を使います。
-
-```typescript
-import { Client } from "npm:@modelcontextprotocol/sdk@1.29.0/client/index.js";
-import { StreamableHTTPClientTransport } from "npm:@modelcontextprotocol/sdk@1.29.0/client/streamableHttp.js";
-
-const transport = new StreamableHTTPClientTransport(new URL("http://localhost:8000/mcp"));
-const client = new Client({ name: "my-agent", version: "1.0.0" });
-await client.connect(transport);
-
-// Task を作成する
-const result = await client.callTool({
-  name: "createTask",
-  arguments: { title: "ログイン機能の実装" },
-});
-
-// 次の Todo を取得する
-const next = await client.callTool({
-  name: "getNextTodo",
-  arguments: { taskId: 1 },
-});
-
-await client.close();
-```
-
 ---
 
 ## skill の設置と使い方
