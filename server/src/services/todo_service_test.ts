@@ -10,6 +10,7 @@ Deno.test("getNextTodo prefers resume todos over normal todos", () => {
     description: "",
     status: "doing",
     priority: 1,
+    branch: "task/1-build-editor",
     createdAt: "2026-08-03T00:00:00.000Z",
     updatedAt: "2026-08-03T00:00:00.000Z",
   });
@@ -53,6 +54,7 @@ Deno.test("askQuestion creates a resume todo after answerQuestion", () => {
     description: "",
     status: "doing",
     priority: 1,
+    branch: "task/1-build-editor",
     createdAt: "2026-08-03T00:00:00.000Z",
     updatedAt: "2026-08-03T00:00:00.000Z",
   });

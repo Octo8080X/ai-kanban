@@ -21,6 +21,7 @@ export interface Task {
   description: string;
   status: TaskStatus;
   priority: number;
+  branch: string;
   createdAt: string;
   updatedAt: string;
 }

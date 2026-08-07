@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "deno run -A main.ts",
-    "help": "deno run -A main.ts --help"
+    "run": "deno run -A cli.ts",
+    "help": "deno run -A cli.ts --help"
   }
 }

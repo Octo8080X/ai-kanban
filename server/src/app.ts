@@ -54,6 +54,12 @@ function badge(status: string) {
   return `<span class="badge badge-${status}">${status}</span>`;
 }
 
+function todoProgressLabel(p: { done: number; total: number }) {
+  if (p.total === 0) return '<span class="empty">Todoなし</span>';
+  const pct = Math.round((p.done / p.total) * 100);
+  return `${p.done}/${p.total}（${pct}%）`;
+}
+
 // Prevent XSS by escaping all user-supplied content before injecting into HTML
 function h(text: string): string {
   return text
@@ -74,17 +80,19 @@ export function createApp(options?: { databasePath?: string }) {
 
   // ── UI: Task 一覧 ─────────────────────────────────────────────────
   app.get("/", (c) => {
-    const tasks = service.listTasks();
-    const rows = tasks.length
-      ? tasks.map((t) =>
-        `<tr>
-          <td><a href="/tasks/${t.id}">${h(t.title)}</a></td>
+    const items = service.listTasksWithProgress();
+    const rows = items.length
+      ? items.map(({ task: t, progress: p }) => {
+        const complete = p.total > 0 && p.done === p.total;
+        return `<tr${complete ? ' style="background:#eee"' : ""}>
+          <td><a href="/tasks/${t.id}">${h(t.title)}</a> <code style="font-size:12px;color:#666">${h(t.branch)}</code></td>
           <td>${badge(t.status)}</td>
           <td>${t.priority}</td>
+          <td>${todoProgressLabel(p)}</td>
           <td>${t.createdAt.slice(0, 10)}</td>
-        </tr>`
-      ).join("")
-      : `<tr><td colspan="4" class="empty">タスクがありません</td></tr>`;
+        </tr>`;
+      }).join("")
+      : `<tr><td colspan="5" class="empty">タスクがありません</td></tr>`;
 
     return c.html(layout("Task 一覧", `
       <h1>Task 一覧</h1>
@@ -97,7 +105,7 @@ export function createApp(options?: { databasePath?: string }) {
         </form>
       </div>
       <table>
-        <thead><tr><th>タイトル</th><th>状態</th><th>優先度</th><th>作成日</th></tr></thead>
+        <thead><tr><th>タイトル / ブランチ</th><th>状態</th><th>優先度</th><th>Todo 進捗</th><th>作成日</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     `));
@@ -122,6 +130,7 @@ export function createApp(options?: { databasePath?: string }) {
     }
     const { task, todos } = result;
     const questions = service.listQuestionsByTask(taskId);
+    const progress = { done: todos.filter((t) => t.status === "done").length, total: todos.length };
 
     const todoRows = todos.length
       ? todos.map((t) =>
@@ -153,7 +162,7 @@ export function createApp(options?: { databasePath?: string }) {
       : `<tr><td colspan="4" class="empty">質問はありません</td></tr>`;
 
     return c.html(layout(`Task: ${h(task.title)}`, `
-      <h1>${h(task.title)}</h1>
+      <h1>${h(task.title)} <code style="font-size:14px;font-weight:normal;color:#666">${h(task.branch)}</code> <span style="font-size:14px;font-weight:normal;color:#666">${todoProgressLabel(progress)}</span></h1>
       <div class="card">
         <p>${task.description ? h(task.description) : '<span class="empty">説明なし</span>'}</p>
         <p>状態: ${badge(task.status)} &nbsp; 優先度: ${task.priority}</p>

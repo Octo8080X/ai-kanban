@@ -30,6 +30,14 @@ export class KanbanService {
     return this.repository.listTasks();
   }
 
+  listTasksWithProgress() {
+    const progress = this.repository.listTodoProgress();
+    return this.repository.listTasks().map((task) => ({
+      task,
+      progress: progress.get(task.id) ?? { done: 0, total: 0 },
+    }));
+  }
+
   addTodo(input: { taskId: number; type?: Todo["type"]; title: string; priority?: number; orderNo?: number }) {
     const now = new Date().toISOString();
     return this.repository.createTodo({

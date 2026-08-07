@@ -8,6 +8,7 @@ function rowToTask(row: Record<string, unknown>): Task {
     description: String(row.description),
     status: row.status as Task["status"],
     priority: Number(row.priority),
+    branch: String(row.branch ?? ""),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -43,7 +44,7 @@ function rowToQuestion(row: Record<string, unknown>): Question {
 export class KanbanRepository {
   constructor(private db: Database) {}
 
-  createTask(input: Omit<Task, "id">) {
+  createTask(input: Omit<Task, "id" | "branch">) {
     this.db
       .prepare(
         `INSERT INTO tasks (title, description, status, priority, created_at, updated_at)
@@ -58,11 +59,33 @@ export class KanbanRepository {
         input.updatedAt,
       );
 
-    return this.getTaskById(this.db.lastInsertRowId)!;
+    const id = this.db.lastInsertRowId;
+    const branch = `task/${id}`;
+    this.db.prepare(`UPDATE tasks SET branch = ? WHERE id = ?`).run(branch, id);
+
+    return this.getTaskById(id)!;
   }
 
   listTasks() {
     return this.db.prepare("SELECT * FROM tasks ORDER BY priority ASC, id ASC").all().map(rowToTask);
+  }
+
+  // taskId -> { done, total } todo counts, for all tasks that have at least one todo.
+  listTodoProgress(): Map<number, { done: number; total: number }> {
+    const rows = this.db
+      .prepare(
+        `SELECT task_id, COUNT(*) AS total, SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) AS done
+         FROM todos
+         GROUP BY task_id`,
+      )
+      .all();
+
+    const progress = new Map<number, { done: number; total: number }>();
+    for (const row of rows) {
+      const r = row as Record<string, unknown>;
+      progress.set(Number(r.task_id), { done: Number(r.done), total: Number(r.total) });
+    }
+    return progress;
   }
 
   getTaskById(id: number) {

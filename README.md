@@ -27,10 +27,10 @@ MCP エンドポイントは `http://localhost:8000/mcp`（Streamable HTTP）で
 
 ```bash
 # 30 秒ごとにポーリングして Claude に todo を実行させる
-deno run -A command/main.ts
+deno run -A command/cli.ts
 
 # 1 回だけ実行して終了
-deno run -A command/main.ts --once
+deno run -A command/cli.ts --once
 ```
 
 CLI は次の順で動作します。
@@ -303,18 +303,15 @@ Claude Code が `askQuestion` を呼ぶと作業が一時停止します。
 
 #### 定期実行 CLI で自動化する
 
-`command/main.ts` は、カンバンの pending todo を見つけて Claude Code に自動で実行させる CLI です。  
+`command/cli.ts` は、カンバンの pending todo を見つけて Claude Code に自動で実行させる CLI です。  
 server が起動している状態で、別ターミナルから実行します。
 
 ```bash
-# 全アクティブタスクを 30 秒ごとにポーリングして実行
-deno run -A command/main.ts
+# ポーリングして継続実行
+deno run -A command/cli.ts
 
-# タスク 1 だけを 1 回だけ実行
-deno run -A command/main.ts --task-id 1 --once
-
-# 60 秒間隔でポーリング
-deno run -A command/main.ts --interval 60
+# 1 回だけ実行して終了
+deno run -A command/cli.ts --once
 ```
 
 内部では次の処理をループします。

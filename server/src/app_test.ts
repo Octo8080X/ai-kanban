@@ -12,6 +12,7 @@ Deno.test("creates and lists tasks through the app", async () => {
   assertEquals(createResponse.status, 201);
   const created = await createResponse.json();
   assertEquals(created.task.title, "Build kanban");
+  assertEquals(created.task.branch, `task/${created.task.id}`);
 
   const listResponse = await app.fetch(new Request("http://localhost/api/tasks"));
   assertEquals(listResponse.status, 200);

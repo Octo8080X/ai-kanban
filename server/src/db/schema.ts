@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   description TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL,
   priority INTEGER NOT NULL DEFAULT 0,
+  branch TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
